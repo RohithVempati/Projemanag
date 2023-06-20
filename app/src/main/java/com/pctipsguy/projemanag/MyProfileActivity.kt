@@ -6,9 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.net.toUri
 import com.bumptech.glide.Glide
-import com.google.common.io.Files.getFileExtension
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.pctipsguy.projemanag.databinding.ActivityMyProfileBinding
@@ -49,16 +47,13 @@ class MyProfileActivity : BaseActivity() {
     }
 
     private fun setupActionBar() {
-
         setSupportActionBar(binding?.toolbarMyProfileActivity)
-
         val actionBar = supportActionBar
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true)
             actionBar.setHomeAsUpIndicator(R.drawable.ic_white_color_back_24dp)
             actionBar.title = resources.getString(R.string.my_profile)
         }
-
         binding?.toolbarMyProfileActivity?.setNavigationOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }

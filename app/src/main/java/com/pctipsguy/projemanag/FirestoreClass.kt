@@ -10,9 +10,7 @@ import com.google.firebase.firestore.SetOptions
 class FirestoreClass {
 
     private val mFireStore = FirebaseFirestore.getInstance()
-
     fun registerUser(activity: SignUpActivity, userInfo: User) {
-
         mFireStore.collection(Constants.USERS)
                 .document(getCurrentUserID())
                 .set(userInfo, SetOptions.merge())
@@ -28,6 +26,18 @@ class FirestoreClass {
                 }
     }
 
+    fun registerBoard(activity: CreateBoardActivity,boardInfo:Board){
+        mFireStore.collection(Constants.BOARDS)
+            .document(getCurrentUserID())
+            .set(boardInfo,SetOptions.merge())
+            .addOnSuccessListener {
+                activity.boardCreationSuccess()
+            }
+            .addOnFailureListener{e ->
+                Log.e(activity.javaClass.simpleName, "registerBoard: ",e )
+
+            }
+    }
     fun updateUserProfile(activity: MyProfileActivity,userHashMap: HashMap<String,Any>){
         mFireStore.collection(Constants.USERS)
             .document(getCurrentUserID())

@@ -4,15 +4,14 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import com.bumptech.glide.Glide
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.pctipsguy.projemanag.databinding.ActivityMainBinding
 import com.pctipsguy.projemanag.databinding.AppBarMainBinding
+import com.pctipsguy.projemanag.databinding.ContentMainBinding
 import com.pctipsguy.projemanag.databinding.NavHeaderMainBinding
 
 class MainActivity : BaseActivity(),NavigationView.OnNavigationItemSelectedListener{
@@ -20,10 +19,10 @@ class MainActivity : BaseActivity(),NavigationView.OnNavigationItemSelectedListe
     private var binding:ActivityMainBinding? = null
     private var appBarBinding:AppBarMainBinding? = null
     private var navbinding:NavHeaderMainBinding? = null
+    private var contentBinding:ContentMainBinding?=null
 
     private var resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            val intent = result.data
             FirestoreClass().signInUser(this)
         }
     }
@@ -32,7 +31,6 @@ class MainActivity : BaseActivity(),NavigationView.OnNavigationItemSelectedListe
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding?.root)
         appBarBinding = AppBarMainBinding.bind(binding?.root!!)
-
         appBarBinding?.toolbarMainActivity?.setNavigationIcon(R.drawable.ic_action_navigation_menu)
         appBarBinding?.toolbarMainActivity?.title = "Welcome"
         setSupportActionBar(appBarBinding?.toolbarMainActivity)
@@ -40,6 +38,10 @@ class MainActivity : BaseActivity(),NavigationView.OnNavigationItemSelectedListe
         toggleDrawer()
         }
         binding?.navView?.setNavigationItemSelectedListener(this)
+        contentBinding = ContentMainBinding.bind(binding?.root!!)
+        contentBinding?.fabCreateBoard?.setOnClickListener {
+            startActivity(Intent(this,CreateBoardActivity::class.java))
+        }
         FirestoreClass().signInUser(this)
     }
     private fun toggleDrawer(){

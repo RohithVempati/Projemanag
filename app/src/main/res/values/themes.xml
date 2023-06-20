@@ -9,6 +9,9 @@
         <item name="android:statusBarColor">@color/colorAccent</item>
         <item name="color">@color/colorPrimary</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorSecondary">@color/colorAccent</item>
+        <item name="colorControlNormal">#fff</item>
+        <item name="colorOnSecondary">#fff</item>
     </style>
 
 

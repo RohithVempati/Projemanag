@@ -5,4 +5,5 @@ object Constants {
     const val IMAGE: String = "image"
     const val Name: String = "name"
     const val MOBILE: String = "mobile"
+    const val BOARDS: String = "boards"
 }
