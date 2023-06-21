@@ -105,6 +105,12 @@ class MainActivity : BaseActivity(),NavigationView.OnNavigationItemSelectedListe
             contentBinding?.rvBoardsList?.layoutManager = LinearLayoutManager(this)
             contentBinding?.rvBoardsList?.setHasFixedSize(true)
             val adapter = BoardItemsAdapter(this,boardsList)
+            adapter.setOnClickListener(object:BoardItemsAdapter.OnClickListener{
+                override fun onClick(position: Int, model: Board) {
+                    startActivity(Intent(this@MainActivity,TaskListActivity::class.java).putExtra(Constants.DOCUMENT_ID,model.documentId))
+                }
+
+            })
             contentBinding?.rvBoardsList?.adapter = adapter
         }
         else{

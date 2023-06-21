@@ -102,10 +102,14 @@ class FirestoreClass {
             .addOnSuccessListener {
                 val boardList:ArrayList<Board> = ArrayList()
                 for(i in it.documents){
-                    val board = i.toObject(Board::class.java)
-                    board?.documentId = i.id
-                    boardList.add(board!!)
+                    val board = i.toObject(Board::class.java)!!
+                    board.documentId = i.id
+                    boardList.add(board)
+                    mFireStore.collection(Constants.BOARDS)
+                        .document(board.documentId)
+                        .set(board,SetOptions.merge())
                 }
+                Log.e("boards","$boardList")
                 activity.popBoardsinUI(boardList)
                 activity.hideProgressDialog()
             }
@@ -114,4 +118,38 @@ class FirestoreClass {
                 Log.e("boarderror", "getBoardsList: ${it.printStackTrace()}")
             }
     }
+
+    fun getBoardDetails(activity: TaskListActivity, documentId: String) {
+        mFireStore.collection(Constants.BOARDS)
+            .document(documentId)
+            .get()
+            .addOnSuccessListener { document ->
+                Log.e(activity.javaClass.simpleName, document.toString())
+                activity.boardDetails(document.toObject(Board::class.java)!!)
+            }
+            .addOnFailureListener { e ->
+                activity.hideProgressDialog()
+                Log.e(activity.javaClass.simpleName, "Error while creating a board.", e)
+            }
+    }
+
+    fun addUpdateTaskList(activity: TaskListActivity, board: Board) {
+
+        Log.e("tessst", board.documentId)
+        val taskListHashMap = HashMap<String, Any>()
+        taskListHashMap[Constants.TASK_LIST] = board.taskList
+
+        mFireStore.collection(Constants.BOARDS)
+            .document(board.documentId)
+            .update(taskListHashMap)
+            .addOnSuccessListener {
+                Log.e(activity.javaClass.simpleName, "TaskList updated successfully.")
+                activity.addUpdateTaskListSuccess()
+            }
+            .addOnFailureListener { e ->
+                activity.hideProgressDialog()
+                Log.e(activity.javaClass.simpleName, "Error while creating a board.", e)
+            }
+    }
+
 }
