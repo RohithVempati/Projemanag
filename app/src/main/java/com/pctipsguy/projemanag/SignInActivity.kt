@@ -15,6 +15,7 @@ class SignInActivity : BaseActivity() {
         setContentView(binding?.root)
         setSupportActionBar(binding?.toolbarSignInActivity)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setHomeAsUpIndicator(R.drawable.ic_black_color_back_24dp)
         binding?.toolbarSignInActivity?.setNavigationOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }

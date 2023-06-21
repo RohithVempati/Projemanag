@@ -3,9 +3,12 @@ package com.pctipsguy.projemanag
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
+import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.GravityCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
@@ -20,10 +23,17 @@ class MainActivity : BaseActivity(),NavigationView.OnNavigationItemSelectedListe
     private var appBarBinding:AppBarMainBinding? = null
     private var navbinding:NavHeaderMainBinding? = null
     private var contentBinding:ContentMainBinding?=null
+    private lateinit var mUserName:String
 
     private var resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             FirestoreClass().signInUser(this)
+        }
+    }
+
+    private var boardActivityLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
+        if(it.resultCode== Activity.RESULT_OK){
+            FirestoreClass().getBoardsList(this)
         }
     }
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,9 +50,9 @@ class MainActivity : BaseActivity(),NavigationView.OnNavigationItemSelectedListe
         binding?.navView?.setNavigationItemSelectedListener(this)
         contentBinding = ContentMainBinding.bind(binding?.root!!)
         contentBinding?.fabCreateBoard?.setOnClickListener {
-            startActivity(Intent(this,CreateBoardActivity::class.java))
+            boardActivityLauncher.launch(Intent(this,CreateBoardActivity::class.java).putExtra(Constants.Name,mUserName))
         }
-        FirestoreClass().signInUser(this)
+        FirestoreClass().signInUser(this,true)
     }
     private fun toggleDrawer(){
         if(binding?.drawerLayout!!.isDrawerOpen(GravityCompat.START)){
@@ -52,7 +62,13 @@ class MainActivity : BaseActivity(),NavigationView.OnNavigationItemSelectedListe
         }
     }
 
-    fun updateNavUserDetails(user:User){
+    fun updateNavUserDetails(user:User,readBoards:Boolean){
+        if(readBoards){
+            Log.e("test","$readBoards")
+            showProgressDialog(resources.getString(R.string.please_wait))
+            FirestoreClass().getBoardsList(this)
+        }
+        mUserName =  user.name
         navbinding = NavHeaderMainBinding.bind(binding?.navView!!.getHeaderView(0))
         Glide
             .with(this)
@@ -79,5 +95,21 @@ class MainActivity : BaseActivity(),NavigationView.OnNavigationItemSelectedListe
         }
         binding?.drawerLayout!!.closeDrawer(GravityCompat.START)
         return true
+    }
+
+    fun popBoardsinUI(boardsList:ArrayList<Board>){
+        hideProgressDialog()
+        if(boardsList.size>0){
+            contentBinding?.tvNoBoardsAvailable?.visibility = View.GONE
+            contentBinding?.rvBoardsList?.visibility = View.VISIBLE
+            contentBinding?.rvBoardsList?.layoutManager = LinearLayoutManager(this)
+            contentBinding?.rvBoardsList?.setHasFixedSize(true)
+            val adapter = BoardItemsAdapter(this,boardsList)
+            contentBinding?.rvBoardsList?.adapter = adapter
+        }
+        else{
+            contentBinding?.tvNoBoardsAvailable?.visibility = View.VISIBLE
+            contentBinding?.rvBoardsList?.visibility = View.GONE
+        }
     }
 }

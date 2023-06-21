@@ -28,7 +28,7 @@ class FirestoreClass {
 
     fun registerBoard(activity: CreateBoardActivity,boardInfo:Board){
         mFireStore.collection(Constants.BOARDS)
-            .document(getCurrentUserID())
+            .document()
             .set(boardInfo,SetOptions.merge())
             .addOnSuccessListener {
                 activity.boardCreationSuccess()
@@ -48,7 +48,7 @@ class FirestoreClass {
             }
     }
 
-    fun signInUser(activity: Activity) {
+    fun signInUser(activity: Activity, readBoards:Boolean=false) {
         mFireStore.collection(Constants.USERS)
                 .document(getCurrentUserID())
                 .get()
@@ -62,7 +62,7 @@ class FirestoreClass {
                             activity.signInSuccess(loggedInUser)
                         }
                         is MainActivity -> {
-                            activity.updateNavUserDetails(loggedInUser)
+                            activity.updateNavUserDetails(loggedInUser,readBoards)
                         }
                         is MyProfileActivity ->{
                             activity.setUserDataInUI(loggedInUser)
@@ -93,5 +93,25 @@ class FirestoreClass {
             currentUserID = currentUser.uid
         }
         return currentUserID
+    }
+
+    fun getBoardsList(activity: MainActivity){
+        mFireStore.collection(Constants.BOARDS)
+            .whereArrayContains(Constants.ASSIGNED_TO,getCurrentUserID())
+            .get()
+            .addOnSuccessListener {
+                val boardList:ArrayList<Board> = ArrayList()
+                for(i in it.documents){
+                    val board = i.toObject(Board::class.java)
+                    board?.documentId = i.id
+                    boardList.add(board!!)
+                }
+                activity.popBoardsinUI(boardList)
+                activity.hideProgressDialog()
+            }
+            .addOnFailureListener{
+                activity.hideProgressDialog()
+                Log.e("boarderror", "getBoardsList: ${it.printStackTrace()}")
+            }
     }
 }

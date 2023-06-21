@@ -13,6 +13,7 @@ import com.pctipsguy.projemanag.databinding.ActivityCreateBoardBinding
 class CreateBoardActivity : BaseActivity() {
     private var binding: ActivityCreateBoardBinding? = null
     private var imageURI: Uri? = null
+    private lateinit var mUserName:String
     private var mBoardImageURL: String? = null
 
     private val openGalleryLauncher =
@@ -28,40 +29,43 @@ class CreateBoardActivity : BaseActivity() {
         binding = ActivityCreateBoardBinding.inflate(layoutInflater)
         setContentView(binding?.root)
         setupActionBar()
+        if(intent.hasExtra(Constants.Name)){
+            mUserName = intent.getStringExtra(Constants.Name)!!
+        }
         binding?.ivBoardImage?.setOnClickListener {
             openGalleryLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         }
         binding?.btnCreate?.setOnClickListener {
-            uploadBoardImage()
+            showProgressDialog(resources.getString(R.string.please_wait))
+            if(imageURI!=null)
+                uploadBoardImage()
+            else
+                createBoard()
         }
     }
 
     private fun uploadBoardImage() {
-        showProgressDialog(resources.getString(R.string.please_wait))
-        if (imageURI != null) {
-            val pathString = "Board_image" + System.currentTimeMillis()
-            Log.e("Image saved", "uploadBoardImage: $pathString")
-            val sRef: StorageReference =
-                FirebaseStorage.getInstance().reference.child(pathString)
-            sRef.putFile(imageURI!!).addOnSuccessListener { takeSnapshot ->
-                Log.i(
-                    "Firebase Image URL",
-                    takeSnapshot.metadata!!.reference!!.downloadUrl.toString()
-
-                )
+        val pathString = "Board_image" + System.currentTimeMillis()
+        Log.e("Image saved", "uploadBoardImage: $pathString")
+        val sRef: StorageReference = FirebaseStorage.getInstance().reference.child(pathString)
+        sRef.putFile(imageURI!!).addOnSuccessListener { takeSnapshot ->
                 takeSnapshot.metadata!!.reference!!.downloadUrl.addOnSuccessListener { url ->
                     Log.i("dowloadableImage", url.toString())
                     mBoardImageURL = url.toString()
-                    if (!mBoardImageURL.isNullOrEmpty()) {
-                        val board = Board(binding?.etBoardName?.text.toString(), mBoardImageURL)
-                        FirestoreClass().registerBoard(this, board)
-                    }
                     Log.e("kkkk", "uploadBoardImage: $mBoardImageURL")
-                    //updateBoardData()
+                    createBoard()
                 }
-
             }
-        }
+    }
+
+    private fun createBoard() {
+        val assignedUsersArrayList:ArrayList<String> = ArrayList()
+        assignedUsersArrayList.add(getCurrentUserID())
+        if(mBoardImageURL==null)
+            mBoardImageURL=""
+        val board = Board(binding?.etBoardName?.text.toString(),
+            mBoardImageURL!!,mUserName,assignedUsersArrayList)
+        FirestoreClass().registerBoard(this, board)
     }
 
     fun boardCreationSuccess() {

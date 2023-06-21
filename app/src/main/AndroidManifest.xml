@@ -24,7 +24,8 @@
             android:exported="false" />
         <activity
             android:name=".BaseActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:theme="@style/Theme.Projemanag"/>
         <activity
             android:name=".SignUpActivity"
             android:exported="false" />
@@ -33,8 +34,7 @@
             android:exported="false" />
         <activity
             android:name=".IntroActivity"
-            android:exported="false"
-            android:theme="@style/Theme.Projemanag" />
+            android:exported="false" />
         <activity
             android:name=".SplashActivity"
             android:exported="true">
