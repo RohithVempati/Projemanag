@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.pctipsguy.projemanag.databinding.ItemTaskBinding
 
@@ -95,6 +96,33 @@ open class TaskListItemsAdapter(
                 }
             }
 
+            holder.tvAddCard.setOnClickListener {
+                holder.tvAddCard.visibility = View.GONE
+                holder.cvAddCard.visibility = View.VISIBLE
+            }
+
+            holder.ibCloseCN.setOnClickListener {
+                holder.tvAddCard.visibility = View.VISIBLE
+                holder.cvAddCard.visibility = View.GONE
+            }
+
+            holder.ibDoneCard.setOnClickListener {
+
+                val cardName = holder.etCardName.text.toString()
+
+                if (cardName.isNotEmpty()) {
+                    if (context is TaskListActivity) {
+                        context.addCardToTaskList(position, cardName)
+                    }
+                }else{
+                    Toast.makeText(context, "Please Enter Card Detail.", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            holder.rvCardList.layoutManager = LinearLayoutManager(context)
+            holder.rvCardList.setHasFixedSize(true)
+            val adapter = CardListItemsAdapter(context, model.cards)
+            holder.rvCardList.adapter = adapter
         }
     }
 
@@ -130,6 +158,7 @@ open class TaskListItemsAdapter(
         val etCardName = itemTaskBinding.etCardName
         val ibDoneCard = itemTaskBinding.ibDoneCardName
         val ibDoneEditList = itemTaskBinding.ibDoneEditListName
+        val tvAddCard = itemTaskBinding.tvAddCard
 
 
     }

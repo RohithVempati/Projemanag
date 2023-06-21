@@ -7,7 +7,7 @@
 
     <style name="Theme.Projemanag" parent="Base.Theme.Projemanag">
         <item name="android:statusBarColor">@color/colorAccent</item>
-        <item name="color">@color/colorPrimary</item>
+        <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorSecondary">@color/colorAccent</item>
         <item name="colorControlNormal">#fff</item>
