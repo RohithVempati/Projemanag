@@ -1,7 +1,9 @@
 package com.pctipsguy.projemanag
 
 import android.content.Context
+import android.graphics.Color
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.pctipsguy.projemanag.databinding.ItemCardBinding
@@ -22,6 +24,15 @@ open class CardListItemsAdapter(
         val model = list[position]
         if (holder is MyViewHolder) {
             holder.tvCardName.text = model.name
+            if(model.labelColor.isNotEmpty()){
+                holder.cardColor.visibility = View.VISIBLE
+                holder.cardColor.setBackgroundColor(Color.parseColor(model.labelColor))
+            }
+            holder.itemView.setOnClickListener{
+                if (onClickListener != null) {
+                    onClickListener!!.onClick(position)
+                }
+            }
         }
     }
 
@@ -34,11 +45,12 @@ open class CardListItemsAdapter(
     }
 
     interface OnClickListener {
-        fun onClick(position: Int, card: Card)
+        fun onClick(cardPosition:Int)
     }
 
     class MyViewHolder(itemCardBinding: ItemCardBinding) :
         RecyclerView.ViewHolder(itemCardBinding.root){
             val tvCardName = itemCardBinding.tvCardName
+        val cardColor = itemCardBinding.viewLabelColor
         }
 }
