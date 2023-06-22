@@ -1,26 +1,40 @@
 package com.pctipsguy.projemanag
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.pctipsguy.projemanag.databinding.ActivityTaskListBinding
 
 class TaskListActivity : BaseActivity(){
     private var binding:ActivityTaskListBinding?=null
+    private lateinit var mBoardDocumentId: String
     private lateinit var mBoardDetails: Board
     private var mTaskList:ArrayList<Task> = ArrayList()
+
+    private val MemberListLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
+        if(it.resultCode==Activity.RESULT_OK){
+            showProgressDialog(resources.getString(R.string.please_wait))
+            FirestoreClass().getBoardDetails(this@TaskListActivity, mBoardDocumentId)
+        } else {
+            Log.e("Cancelled", "Cancelled")
+        }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityTaskListBinding.inflate(layoutInflater)
         setContentView(binding?.root)
 
-        var boardDocumentId = ""
         if (intent.hasExtra(Constants.DOCUMENT_ID)) {
-            boardDocumentId = intent.getStringExtra(Constants.DOCUMENT_ID)!!
+            mBoardDocumentId = intent.getStringExtra(Constants.DOCUMENT_ID)!!
         }
 
         showProgressDialog(resources.getString(R.string.please_wait))
-        FirestoreClass().getBoardDetails(this@TaskListActivity, boardDocumentId)
+        FirestoreClass().getBoardDetails(this@TaskListActivity, mBoardDocumentId)
     }
 
     private fun setupActionBar() {
@@ -32,7 +46,7 @@ class TaskListActivity : BaseActivity(){
             actionBar.setHomeAsUpIndicator(R.drawable.ic_white_color_back_24dp)
             actionBar.title = mBoardDetails.boardName
         }
-        binding?.toolbarTaskListActivity?.setNavigationOnClickListener { onBackPressed() }
+        binding?.toolbarTaskListActivity?.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
     }
 
     fun boardDetails(board: Board) {
@@ -95,5 +109,20 @@ class TaskListActivity : BaseActivity(){
         FirestoreClass().addUpdateTaskList(this@TaskListActivity, mBoardDetails)
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_members, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.action_members -> {
+                intent = Intent(this@TaskListActivity, MembersActivity::class.java)
+                    .putExtra(Constants.BOARD_DETAIL, mBoardDetails)
+                MemberListLauncher.launch(intent)
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
 }
