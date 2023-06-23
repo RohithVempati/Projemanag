@@ -1,6 +1,8 @@
 package com.pctipsguy.projemanag
 
 object Constants {
+    const val UN_SELECT: String = "Unselect"
+    const val SELECT: String = "Select"
     const val ID: String = "id"
     const val DOCUMENT_ID: String = "documentId"
     const val USERS: String = "users"
