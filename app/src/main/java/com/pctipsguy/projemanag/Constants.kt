@@ -14,4 +14,5 @@ object Constants {
     const val EMAIL: String = "email"
     const val TASK_LIST_ITEM_POSITION = "task_list_item_position"
     const val CARD_LIST_ITEM_POSITION = "card_list_item_position"
+    const val BOARD_MEMBERS_LIST = "board_members_list"
 }

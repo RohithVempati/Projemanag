@@ -3,6 +3,7 @@ package com.pctipsguy.projemanag
 import android.app.AlertDialog
 import android.content.Context
 import android.content.res.Resources
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,10 +37,12 @@ open class TaskListItemsAdapter(
 
         if (holder is MyViewHolder) {
 
-            if (position == list.size - 1) {
+            if (position == list.size-1) {
+                Log.e("positionIf", "onBindViewHolder: $position" )
                 holder.addTaskList.visibility = View.VISIBLE
                 holder.taskItem.visibility = View.GONE
             } else {
+                Log.e("position", "onBindViewHolder: $position" )
                 holder.addTaskList.visibility = View.GONE
                 holder.taskItem.visibility = View.VISIBLE
             }
@@ -126,13 +129,15 @@ open class TaskListItemsAdapter(
             adapter.setOnClickListener(object :
                 CardListItemsAdapter.OnClickListener {
                 override fun onClick(cardPosition: Int) {
-
                     if (context is TaskListActivity) {
                         context.cardDetails(holder.adapterPosition, cardPosition)
                     }
                 }
             })
 
+        }
+        else{
+            Log.e("positionTest", "onBindViewHolder: $position" )
         }
     }
 

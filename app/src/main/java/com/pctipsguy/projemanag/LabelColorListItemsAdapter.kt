@@ -50,7 +50,6 @@ class LabelColorListItemsAdapter(
         RecyclerView.ViewHolder(itemLabelColorBinding.root){
             val iv_selected_color = itemLabelColorBinding.ivSelectedColor
             val view_main = itemLabelColorBinding.viewMain
-            val fl_main = itemLabelColorBinding.flMain
         }
 
     interface OnItemClickListener {

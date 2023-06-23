@@ -16,6 +16,7 @@ class CardDetailsActivity : BaseActivity() {
     private lateinit var mBoardDetails:Board
     private var binding:ActivityCardDetailsBinding? = null
     private var mSelectedColor: String = ""
+    private lateinit var mMembersDetailList: ArrayList<User>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,6 +26,11 @@ class CardDetailsActivity : BaseActivity() {
         setupActionBar()
         binding?.etNameCardDetails?.setText(mBoardDetails.taskList[mTasKListPosition].cards[mCardPosition].name)
         binding?.etNameCardDetails?.setSelection(binding?.etNameCardDetails?.text.toString().length)
+        if(mBoardDetails.taskList[mTasKListPosition].cards[mCardPosition].labelColor.isNotEmpty()){
+            mSelectedColor = mBoardDetails.taskList[mTasKListPosition].cards[mCardPosition].labelColor
+            binding?.tvSelectLabelColor?.text = ""
+            binding?.tvSelectLabelColor?.setBackgroundColor(Color.parseColor(mSelectedColor))
+        }
         binding?.btnUpdateCardDetails?.setOnClickListener {
             if(binding?.etNameCardDetails?.text.toString().isNotEmpty()) {
                 updateCardDetails()
@@ -34,6 +40,9 @@ class CardDetailsActivity : BaseActivity() {
         }
         binding?.tvSelectLabelColor?.setOnClickListener {
             labelColorsListDialog()
+        }
+        binding?.tvSelectMembers?.setOnClickListener {
+            membersListDialog()
         }
     }
 
@@ -47,6 +56,9 @@ class CardDetailsActivity : BaseActivity() {
         }
         if(intent.hasExtra(Constants.CARD_LIST_ITEM_POSITION)){
             mCardPosition = intent.getIntExtra(Constants.CARD_LIST_ITEM_POSITION,0)
+        }
+        if(intent.hasExtra(Constants.BOARD_MEMBERS_LIST)){
+            mMembersDetailList = intent.getParcelableArrayListExtra(Constants.BOARD_MEMBERS_LIST)!!
         }
     }
 
@@ -123,7 +135,8 @@ class CardDetailsActivity : BaseActivity() {
         val listDialog = object : LabelColorListDialog(
             this@CardDetailsActivity,
             colorsList,
-            resources.getString(R.string.str_select_label_color)
+            resources.getString(R.string.str_select_label_color),
+            mSelectedColor
         ) {
             override fun onItemSelected(color: String) {
                 mSelectedColor = color
@@ -170,5 +183,33 @@ class CardDetailsActivity : BaseActivity() {
         FirestoreClass().addUpdateTaskList(this@CardDetailsActivity, mBoardDetails)
     }
 
+    private fun membersListDialog() {
+        val cardAssignedMembersList =
+            mBoardDetails.taskList[mTasKListPosition].cards[mCardPosition].assignedTo
+
+        if (cardAssignedMembersList.size > 0) {
+            for (i in mMembersDetailList.indices) {
+                for (j in cardAssignedMembersList) {
+                    if (mMembersDetailList[i].id == j) {
+                        mMembersDetailList[i].selected = true
+                    }
+                }
+            }
+        } else {
+            for (i in mMembersDetailList.indices) {
+                mMembersDetailList[i].selected = false
+            }
+        }
+
+        val listDialog = object : MembersListDialog(
+            this@CardDetailsActivity,
+            mMembersDetailList,
+            resources.getString(R.string.str_select_member)
+        ) {
+            override fun onItemSelected(user: User, action: String) {
+            }
+        }
+        listDialog.show()
+    }
 
 }
