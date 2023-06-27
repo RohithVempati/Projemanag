@@ -49,6 +49,17 @@ open class MemberListItemsAdapter(
             else{
                 holder.iv_selected_member.visibility = View.GONE
             }
+            holder.itemView.setOnClickListener {
+
+                if (onClickListener != null) {
+                    if (model.selected) {
+                        onClickListener!!.onClick(position, model, Constants.UN_SELECT)
+                    } else {
+                        onClickListener!!.onClick(position, model, Constants.SELECT)
+                    }
+                }
+            }
+
         }
     }
 

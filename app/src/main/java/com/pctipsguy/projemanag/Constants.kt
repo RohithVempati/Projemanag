@@ -1,6 +1,8 @@
 package com.pctipsguy.projemanag
 
 object Constants {
+    const val UN_SELECT: String = "Unselect"
+    const val SELECT: String = "Select"
     const val ID: String = "id"
     const val DOCUMENT_ID: String = "documentId"
     const val USERS: String = "users"
@@ -15,4 +17,15 @@ object Constants {
     const val TASK_LIST_ITEM_POSITION = "task_list_item_position"
     const val CARD_LIST_ITEM_POSITION = "card_list_item_position"
     const val BOARD_MEMBERS_LIST = "board_members_list"
+    const val PROGEMANAG_PREFERENCES: String = "ProjemanagPrefs"
+    const val FCM_TOKEN:String = "fcmToken"
+    const val FCM_TOKEN_UPDATED:String = "fcmTokenUpdated"
+    const val FCM_BASE_URL:String = "https://fcm.googleapis.com/fcm/send"
+    const val FCM_AUTHORIZATION:String = "authorization"
+    const val FCM_KEY:String = "key"
+    const val FCM_SERVER_KEY:String = "replace with your key"
+    const val FCM_KEY_TITLE:String = "title"
+    const val FCM_KEY_MESSAGE:String = "message"
+    const val FCM_KEY_DATA:String = "data"
+    const val FCM_KEY_TO:String = "to"
 }

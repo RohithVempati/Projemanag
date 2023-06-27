@@ -37,13 +37,39 @@ class FirestoreClass {
 
             }
     }
-    fun updateUserProfile(activity: MyProfileActivity,userHashMap: HashMap<String,Any>){
-        mFireStore.collection(Constants.USERS)
-            .document(getCurrentUserID())
-            .update(userHashMap)
+    fun updateUserProfile(activity: Activity, userHashMap: HashMap<String, Any>) {
+        mFireStore.collection(Constants.USERS) // Collection Name
+            .document(getCurrentUserID()) // Document ID
+            .update(userHashMap) // A hashmap of fields which are to be updated.
             .addOnSuccessListener {
-                Log.i(activity.javaClass.simpleName, "Profile dataa updated")
-                activity.profileUpdateSuccess()
+                Log.e(activity.javaClass.simpleName, "Data updated successfully!")
+
+                // Notify the success result.
+
+                when (activity) {
+                    is MainActivity -> {
+                        activity.tokenUpdateSuccess()
+                    }
+                    is MyProfileActivity -> {
+                        activity.profileUpdateSuccess()
+                    }
+                }
+            }
+            .addOnFailureListener { e ->
+                when (activity) {
+                    is MainActivity -> {
+                        activity.hideProgressDialog()
+                    }
+                    is MyProfileActivity -> {
+                        activity.hideProgressDialog()
+                    }
+                }
+
+                Log.e(
+                    activity.javaClass.simpleName,
+                    "Error while creating a board.",
+                    e
+                )
             }
     }
 
