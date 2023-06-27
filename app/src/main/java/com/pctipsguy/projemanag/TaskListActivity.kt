@@ -140,4 +140,10 @@ class TaskListActivity : BaseActivity(){
         val adapter = TaskListItemsAdapter(this@TaskListActivity, mBoardDetails.taskList)
         binding?.rvTaskList?.adapter = adapter
     }
+
+    fun updateCardsInTasKList(taskListPosition: Int,cards:ArrayList<Card>){
+        mBoardDetails.taskList[taskListPosition].cards = cards
+        showProgressDialog(resources.getString(R.string.please_wait))
+        FirestoreClass().addUpdateTaskList(this@TaskListActivity,mBoardDetails)
+    }
 }

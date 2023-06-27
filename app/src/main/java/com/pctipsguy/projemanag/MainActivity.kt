@@ -1,7 +1,9 @@
 package com.pctipsguy.projemanag
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
@@ -12,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.messaging.FirebaseMessaging
 import com.pctipsguy.projemanag.databinding.ActivityMainBinding
 import com.pctipsguy.projemanag.databinding.AppBarMainBinding
 import com.pctipsguy.projemanag.databinding.ContentMainBinding
@@ -24,6 +27,7 @@ class MainActivity : BaseActivity(),NavigationView.OnNavigationItemSelectedListe
     private var navbinding:NavHeaderMainBinding? = null
     private var contentBinding:ContentMainBinding?=null
     private lateinit var mUserName:String
+    private lateinit var mSharedPreferences: SharedPreferences
 
     private var resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
@@ -40,6 +44,20 @@ class MainActivity : BaseActivity(),NavigationView.OnNavigationItemSelectedListe
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding?.root)
+        mSharedPreferences =
+            this.getSharedPreferences(Constants.PROGEMANAG_PREFERENCES, Context.MODE_PRIVATE)
+
+        val tokenUpdated = mSharedPreferences.getBoolean(Constants.FCM_TOKEN_UPDATED, false)
+
+        if (tokenUpdated) {
+            showProgressDialog(resources.getString(R.string.please_wait))
+            FirestoreClass().signInUser(this@MainActivity, true)
+        } else {
+            FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
+                updateFCMToken(token)
+            }
+        }
+
         appBarBinding = AppBarMainBinding.bind(binding?.root!!)
         appBarBinding?.toolbarMainActivity?.setNavigationIcon(R.drawable.ic_action_navigation_menu)
         appBarBinding?.toolbarMainActivity?.title = "Welcome"
@@ -63,6 +81,7 @@ class MainActivity : BaseActivity(),NavigationView.OnNavigationItemSelectedListe
     }
 
     fun updateNavUserDetails(user:User,readBoards:Boolean){
+        hideProgressDialog()
         if(readBoards){
             Log.e("test","$readBoards")
             showProgressDialog(resources.getString(R.string.please_wait))
@@ -78,6 +97,28 @@ class MainActivity : BaseActivity(),NavigationView.OnNavigationItemSelectedListe
             .into(navbinding?.ivUserImage!!)
         navbinding?.tvUsername?.text = user.name
     }
+
+    private fun updateFCMToken(token: String) {
+
+        val userHashMap = HashMap<String, Any>()
+        userHashMap[Constants.FCM_TOKEN] = token
+
+        showProgressDialog(resources.getString(R.string.please_wait))
+        FirestoreClass().updateUserProfile(this@MainActivity, userHashMap)
+    }
+
+    fun tokenUpdateSuccess() {
+
+        hideProgressDialog()
+
+        val editor: SharedPreferences.Editor = mSharedPreferences.edit()
+        editor.putBoolean(Constants.FCM_TOKEN_UPDATED, true)
+        editor.apply()
+
+        FirestoreClass().signInUser(this@MainActivity, true)
+    }
+
+
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
