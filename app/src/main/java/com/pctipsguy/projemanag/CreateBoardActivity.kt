@@ -1,6 +1,6 @@
 package com.pctipsguy.projemanag
 
-import android.app.Activity
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -70,7 +70,7 @@ class CreateBoardActivity : BaseActivity() {
 
     fun boardCreationSuccess() {
         hideProgressDialog()
-        setResult(Activity.RESULT_OK)
+        startActivity(Intent(this,MainActivity::class.java))
         finish()
     }
 

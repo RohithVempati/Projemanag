@@ -279,4 +279,16 @@ class FirestoreClass {
             }
     }
 
+    fun deleteBoard(boardId:String){
+        mFireStore.collection(Constants.BOARDS)
+            .document(boardId)
+            .delete()
+    }
+
+    fun editBoard(boardId: String,boardInfo: Board){
+        mFireStore.collection(Constants.BOARDS)
+            .document(boardId)
+            .set(boardInfo,SetOptions.merge())
+    }
+
 }

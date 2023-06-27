@@ -35,7 +35,12 @@ open class BoardItemsAdapter(private val context: Context, private var list: Arr
             holder.itemView.setOnClickListener {
 
                 if (onClickListener != null) {
-                    onClickListener!!.onClick(position, model)
+                    onClickListener!!.onClick(position, model,false)
+                }
+            }
+            holder.boardImage.setOnClickListener{
+                if(onClickListener!=null){
+                    onClickListener!!.onClick(position,model,true)
                 }
             }
         }
@@ -50,7 +55,35 @@ open class BoardItemsAdapter(private val context: Context, private var list: Arr
     }
 
     interface OnClickListener {
-        fun onClick(position: Int, model: Board)
+        fun onClick(position: Int, model: Board,edit:Boolean)
+    }
+
+    fun notifyDeleteItem(user:User, position: Int){
+        if(user.id==list[position].assignedTo[0]) {
+            FirestoreClass().deleteBoard(list[position].documentId)
+            list.removeAt(position)
+        }
+        else{
+            (context as MainActivity).showErrorSnackBar("ONly creator can destroy")
+        }
+        (context as MainActivity).updateNavUserDetails(user,true)
+        notifyItemChanged(position)
+    }
+
+    fun notifyEditItem(user: User,position: Int,board: String){
+        list[position].boardName = board
+        FirestoreClass().editBoard(list[position].documentId, list[position])
+        (context as MainActivity).updateNavUserDetails(user,true)
+        notifyItemChanged(position)
+    }
+
+    fun notifyEditPic(user:User,position: Int,imageUrl: String){
+        list[position].boardImage = imageUrl
+        FirestoreClass().editBoard(list[position].documentId,list[position])
+        notifyItemChanged(position)
+        (context as MainActivity).updateNavUserDetails(user,true)
+        context.hideProgressDialog()
+
     }
 
     private class MyViewHolder(itemBoardBinding: ItemBoardBinding) :
